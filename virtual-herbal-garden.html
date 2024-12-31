@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanaOsadhi</title>
+    <link rel="stylesheet" href="project2.css">
+</head>
+<body>
+    <header>
+        <h1>AYUSH Virtual Herbal Garden</h1>
+        <p>Explore the healing wisdom of traditional medicinal plants</p>
+    </header>
+
+    <nav class="systems-nav">
+        <button class="system-btn active" data-system="all">All Plants</button>
+        <button class="system-btn" data-system="ayurveda">Ayurveda</button>
+        <button class="system-btn" data-system="yoga">Yoga</button>
+        <button class="system-btn" data-system="unani">Unani</button>
+        <button class="system-btn" data-system="siddha">Siddha</button>
+        <button class="system-btn" data-system="homeopathy">Homeopathy</button>
+    </nav>
+
+    <main class="garden-container">
+        <div class="plants-grid" id="plantsGrid"></div>
+    </main>
+
+    <div class="modal" id="plantModal">
+        <div class="modal-content">
+            <button class="close-btn">&times;</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const plantsData = [
+            {
+                name: "Tulsi (Holy Basil)",
+                image: "https://images.unsplash.com/photo-1665479754958-1a8bdc47cc0d?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjh8fHR1bHNpfGVufDB8fDB8fHww",
+                description: "Sacred plant in Ayurveda known for its healing properties",
+                systems: ["ayurveda", "yoga"],
+                benefits: [
+                    "Boosts immunity",
+                    "Reduces stress and anxiety",
+                    "Improves respiratory health",
+                    "Anti-inflammatory properties"
+                ],
+                usage: "Can be consumed as tea, added to food, or used in traditional remedies"
+            },
+            {
+                name: "Ashwagandha",
+                image: "https://media.istockphoto.com/id/1286731715/photo/root-withania-somnifera-known-commonly-as-ashwagandha-indian-ginseng-poison-gooseberry-or.jpg?s=612x612&w=0&k=20&c=dpgMh_ZgDzz2sZniGCzd5NBa0iAn7zBkjBya46YylyI=",
+                description: "Adaptogenic herb used in traditional Indian medicine",
+                systems: ["ayurveda"],
+                benefits: [
+                    "Reduces stress and anxiety",
+                    "Improves strength and stamina",
+                    "Enhances cognitive function",
+                    "Supports immune system"
+                ],
+                usage: "Available as powder, capsules, or liquid extract"
+            },
+            {
+                name: "Neem",
+                image: "https://images.unsplash.com/photo-1669574753106-28167b097433?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8bmVlbXxlbnwwfHwwfHx8MA%3D%3D",
+                description: "Versatile medicinal plant with multiple health benefits",
+                systems: ["ayurveda", "unani"],
+                benefits: [
+                    "Natural antibacterial",
+                    "Supports skin health",
+                    "Blood purifier",
+                    "Dental health"
+                ],
+                usage: "Used in oils, creams, and traditional medicines"
+            },
+            {
+                name: "Calendula",
+                image: "https://images.unsplash.com/photo-1632602304887-8439a8a14f37?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Y2FsZW5kdWxhfGVufDB8fDB8fHww",
+                description: "Flowering plant used in homeopathic medicine",
+                systems: ["homeopathy"],
+                benefits: [
+                    "Wound healing",
+                    "Skin inflammation",
+                    "Anti-fungal properties",
+                    "Immune system support"
+                ],
+                usage: "Applied topically or taken as homeopathic preparation"
+            },
+            {
+                name: "Valerian Root",
+                image: "https://images.unsplash.com/photo-1652868159823-7e11f476d61a?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fHZhbGVyaWFufGVufDB8fDB8fHww",
+                description: "Natural sleep aid used in multiple traditional systems",
+                systems: ["unani", "homeopathy"],
+                benefits: [
+                    "Improves sleep quality",
+                    "Reduces anxiety",
+                    "Muscle relaxation",
+                    "Stress relief"
+                ],
+                usage: "Available as tea, tincture, or capsules"
+            },
+            {
+                name: "ALoevera",
+                image: "https://plus.unsplash.com/premium_photo-1674008125024-0b92f26d61d9?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGFsb2V2ZXJhfGVufDB8fDB8fHww",
+                description: "Important herb in Siddha medicine",
+                systems: ["siddha"],
+                benefits: [
+                    "Fever reduction",
+                    "Anti-viral properties",
+                    "Boosts immunity",
+                    "Anti-inflammatory"
+                ],
+                usage: "Consumed as decoction or powder"
+            }
+        ];
+
+        function createPlantCard(plant) {
+            return `
+                <div class="plant-card" data-name="${plant.name}">
+                    <div class="plant-image" style="background-image: url('${plant.image}')"></div>
+                    <div class="plant-info">
+                        <h3 class="plant-name">${plant.name}</h3>
+                        <p class="plant-description">${plant.description}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showPlantDetails(plant) {
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <h2>${plant.name}</h2>
+                <div class="plant-image" style="background-image: url('${plant.image}'); height: 300px; margin: 1rem 0;"></div>
+                <p>${plant.description}</p>
+                <h3>Benefits:</h3>
+                <ul class="benefits-list">
+                    ${plant.benefits.map(benefit => `<li>${benefit}</li>`).join('')}
+                </ul>
+                <div class="usage-info">
+                    <h3>How to Use:</h3>
+                    <p>${plant.usage}</p>
+                </div>
+            `;
+            document.getElementById('plantModal').style.display = 'block';
+        }
+
+        // Initialize the garden
+        function initGarden() {
+            const grid = document.getElementById('plantsGrid');
+            const modal = document.getElementById('plantModal');
+            const closeBtn = document.querySelector('.close-btn');
+
+            // Display all plants initially
+            grid.innerHTML = plantsData.map(plant => createPlantCard(plant)).join('');
+
+            // Add click handlers for plant cards
+            grid.addEventListener('click', (e) => {
+                const card = e.target.closest('.plant-card');
+                if (card) {
+                    const plant = plantsData.find(p => p.name === card.dataset.name);
+                    showPlantDetails(plant);
+                }
+            });
+
+            // Close modal when clicking close button or outside
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // System filter buttons
+            document.querySelectorAll('.system-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Update active button
+                    document.querySelectorAll('.system-btn').forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    // Filter plants
+                    const system = button.dataset.system;
+                    const filteredPlants = system === 'all' 
+                        ? plantsData 
+                        : plantsData.filter(plant => plant.systems.includes(system));
+                    
+                    grid.innerHTML = filteredPlants.map(plant => createPlantCard(plant)).join('');
+                });
+            });
+        }
+
+        // Start the application
+        initGarden();
+    </script>
+</body>
+</html>
